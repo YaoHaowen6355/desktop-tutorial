@@ -23,11 +23,11 @@ put_num=0
 error_num=0
 
 def Cope_with_client(client_socket):
-    global client_num,operation_num,read_num,get_num,put_num=0,error_num
+    global client_num,operation_num,read_num,get_num,put_num=0,error_num  #Declare global variables.
     client_num+=1
     while True:
       try:  
-        receive_data = client_socket.recv(1024)#The client receives a maximum of 1024 bytes of data.
+        receive_data = client_socket.recv(1024)  #The client receives a maximum of 1024 bytes of data.
         if not receive_data:
             break
         request=receive_data.decode('utf-8')
@@ -41,8 +41,16 @@ def Cope_with_client(client_socket):
     client_socket.close()#Close the client socket.
 
     def process_request(request):
-    
-        
+        global read_num, get_num,put_num  #Declare global variables.
+        key=request[5:].split('')[0]  #Extract key value pairs starting from the 6th character of the request string.
+        command=request[3]  #Extract the operation command from the 4th character of the request string.
+        if command == 'R':  #Count according to the corresponding commands.
+          read_num+= 1
+        elif command == 'G':
+          get_num+= 1
+        elif command == 'P':
+          put+num+=1
+        return "Invalid command"
 
     def process_read():
 
