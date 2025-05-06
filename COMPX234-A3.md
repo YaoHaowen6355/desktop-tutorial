@@ -1,0 +1,38 @@
+# Welcome to GitHub Desktop!
+
+This is your README. READMEs are where you can communicate what your project is and how to use it.
+
+
+YaoHaowen
+Write your name on line 6, save it, and then head back to GitHub Desktop.
+
+#server
+
+#import library
+import socket
+import threading
+from collections import defualtdict
+
+#Provide variables to store data.
+tuple_info = 0
+client_num=0
+operation_num=0
+read_num=0
+get_num=0
+put_num=0
+error_num=0
+
+def Cope_with_client():
+    global client_num,operation_num,read_num,get_num,put_num=0,error_num
+    client_num+=1
+    while True:
+        receive_data = client_socket.recv(1024)
+        if not receive_data:
+            break
+        request=receive_data.decode('utf-8')
+        response = process_request(request)
+        operation_num+=1
+    except Exception as ex:
+        print("Handle errors",{ex})
+        break
+
