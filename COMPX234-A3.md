@@ -46,10 +46,13 @@ def Cope_with_client(client_socket):
         command=request[3]  #Extract the operation command from the 4th character of the request string.
         if command == 'R':  #Count according to the corresponding commands.
           read_num+= 1
+          return process_read()
         elif command == 'G':
           get_num+= 1
+          return process_get()
         elif command == 'P':
           put+num+=1
+          return def process_put()
         return "Invalid command"
 
     def process_read():
