@@ -24,7 +24,17 @@ def run_client(hostname, port, request_file):
              if line:
                  request=optimize_input(line)
                  client_socket.send(request.encode('utf- 8'))
+                 #Receive up to 1024 bytes of response data from the server and decode it into a UTF-8 string.
                  data=client_socket.recv(1024)
                  response=data.decode('utf- 8')
     client_socket.close()
+
+if __name__ == "__main__":
+    if len(sys.argv) != 4:  #Set it so that the client can only run when the number of parameters is 4.
+        print("Usage: python Client.py <hostname> <port> <requestFile>")
+        sys.exit(1)
     
+    hostname = sys.argv[1]
+    port = int(sys.argv[2])
+    request_file = sys.argv[3]
+    start_client(hostname, port, request_file)

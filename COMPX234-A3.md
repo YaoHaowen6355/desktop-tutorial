@@ -106,6 +106,11 @@ def Cope_with_client(client_socket):
         server_socket.listen(5) #Start listening for connections, allowing a maximum of 5 connections to wait in the queue for processing. 
         print("Server started on port 51234")
 
+        while True：
+           client_socket, client_address = server_socket.accept()
+           client_thread = threading.Thread(target = handle_client, args = (client_socket,))
+           client_thread.start()
+
     if __name__ == "__main__":
         run_server()
 
