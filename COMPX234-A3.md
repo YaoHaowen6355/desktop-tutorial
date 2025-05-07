@@ -103,8 +103,10 @@ def Cope_with_client(client_socket):
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         server_socket.bind(('localhost', 51234))
-        server_socket.listen(5)
+        server_socket.listen(5) #Start listening for connections, allowing a maximum of 5 connections to wait in the queue for processing. 
         print("Server started on port 51234")
+
+        
 
 
 
