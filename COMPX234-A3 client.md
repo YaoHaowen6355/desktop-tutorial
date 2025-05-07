@@ -18,17 +18,19 @@ def run_client(hostname, port, request_file):
       #Create a TCP socket object. `socket.AF_INET` indicates using the IPv4 address family. Try to connect to the specified server.
      client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
      client_socket.connect((hostname, port))
+     with open(request_file, 'r') as file:
+        for line in file:
+            if line:
+                request = optimize_input(line)
+                client_socket.send(request.encode('utf- 8'))
+                # Receive up to 1024 bytes of response data from the server and decode it into a UTF-8 string.
+                data = client_socket.recv(1024)
+                response = data.decode('utf- 8')
+                print(f"{line}: {response}")
 
-     with open(request_file,'r') as file:
-         for line in file:
-             if line:
-                 request=optimize_input(line)
-                 client_socket.send(request.encode('utf- 8'))
-                 #Receive up to 1024 bytes of response data from the server and decode it into a UTF-8 string.
-                 data=client_socket.recv(1024)
-                 response=data.decode('utf- 8')
-                 print(f"{line}: {response}")
-    client_socket.close()
+      client_socket.close()
+
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 4:  #Set it so that the client can only run when the number of parameters is 4.
@@ -38,4 +40,4 @@ if __name__ == "__main__":
     hostname = sys.argv[1]
     port = int(sys.argv[2])
     request_file = sys.argv[3]
-    start_client(hostname, port, request_file)
+    run_client(hostname, port, request_file)

@@ -9,11 +9,11 @@ Write your name on line 6, save it, and then head back to GitHub Desktop.
 
 import socket
 import threading
-from collections import defualtdict
+from collections import defaultdict
 from time import sleep
 
 #Provide variables to store data.
-tuple_info = 0
+tuple_info = defaultdict(str)
 client_num=0
 operation_num=0
 read_num=0
@@ -21,27 +21,28 @@ get_num=0
 put_num=0
 error_num=0
 
-def Cope_with_client(client_socket):
-    global client_num,operation_num,read_num,get_num,put_num=0,error_num  #Declare global variables.
-    client_num+=1
-    while True:
-      try:  
-        receive_data = client_socket.recv(1024)  #The client receives a maximum of 1024 bytes of data.
-        if not receive_data:
-            break
-        request=receive_data.decode('utf-8')
-        response = process_request(request)
-        encoded_response = response.encode('utf - 8')#Send a response to the client.
-        client_socket.send(encoded_response)
-        operation_num+=1
-      except Exception as ex:
-        print("Handle errors",{ex})
-        break
-    client_socket.close()#Close the client socket.
+    def Cope_with_client(client_socket):
+        global client_num,operation_num,read_num,get_num,put_num,error_num  #Declare global variables.
+        client_num+=1
+           while True:
+               try:  
+                 receive_data = client_socket.recv(1024)  #The client receives a maximum of 1024 bytes of data.
+                 if not receive_data:
+                 break
+                request=receive_data.decode('utf-8')
+                response = process_request(request)
+                encoded_response = response.encode('utf-8')#Send a response to the client.
+                client_socket.send(encoded_response)
+                 operation_num+=1
+                except Exception as ex:
+          print(f"Handle errors: {ex}")
+          error_num += 1
+          break
+         client_socket.close()#Close the client socket.
 
     def process_request(request):
         global read_num, get_num,put_num  #Declare global variables.
-        key=request[5:].split('')[0]  #Extract key value pairs starting from the 6th character of the request string.
+        key = request[5:].split(' ')[0] #Extract key value pairs starting from the 6th character of the request string.
         command=request[3]  #Extract the operation command from the 4th character of the request string.
         if command == 'R':  #Count according to the corresponding commands.
           read_num+= 1
@@ -50,30 +51,31 @@ def Cope_with_client(client_socket):
           get_num+= 1
           return process_get(key)
         elif command == 'P':
-          put+num+=1
+          put_num+=1
           value = request[5 + len(key) + 1:]
-          return def process_put(key,value)
+          return process_put(key,value)
         return "Invalid command"
 
     #Read the value of a specific key in the `tuple_info` dictionary. 
-    def process_read():
+    def process_read(key):
         if key in tuple_info:
             return f"OK({key},{tuple_info[key]}) read"
         return f"ERR {key} does not exist"
 
     #Retrieve and remove the value of a specific key from the `tuple_info` dictionary.
-    def process_get():
+    def process_get(key):
         if key in tuple_info:
            value = tuple_info.pop(key)
            return f"OK ({key}, {value}) removed"
         return f"ERR {key} does not exist"
 
     #Insert a new key-value pair into the `tuple_info` dictionary.
-    def process_put():
+    def process_put(key,value):
         if key in tuple_info:
             return f"ERR {key} already exists"
         tuple_info[key]=value
         return f"OK ({key}, {value}) added"
+
 
     def print_all():
         while True:
@@ -106,13 +108,13 @@ def Cope_with_client(client_socket):
         server_socket.listen(5) #Start listening for connections, allowing a maximum of 5 connections to wait in the queue for processing. 
         print("Server started on port 51234")
 
-        summary_thread = threading.Thread(target = print_summary)
+        summary_thread = threading.Thread(target = print_all)
         summary_thread.daemon = True
         summary_thread.start()                        
-        while True：
-           client_socket, client_address = server_socket.accept()
-           client_thread = threading.Thread(target = handle_client, args = (client_socket,))
-           client_thread.start()
+        while True:
+            client_socket, client_address = server_socket.accept()
+            client_thread = threading.Thread(target=Cope_with_client(), args=(client_socket,))
+            client_thread.start()
 
     if __name__ == "__main__":
         run_server()
