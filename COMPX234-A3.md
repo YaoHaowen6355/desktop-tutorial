@@ -59,12 +59,14 @@ def Cope_with_client(client_socket):
     def process_read():
         if key in tuple_info:
             return f"OK({key},{tuple_info[key]}) read"
+        return f"ERR {key} does not exist"
 
     #Retrieve and remove the value of a specific key from the `tuple_info` dictionary.
     def process_get():
         if key in tuple_info:
            value = tuple_info.pop(key)
            return f"OK ({key}, {value}) removed"
+        return f"ERR {key} does not exist"
 
     #Insert a new key-value pair into the `tuple_info` dictionary.
     def process_put():
@@ -96,6 +98,13 @@ def Cope_with_client(client_socket):
             print(f"Total GETs: {get_num}")
             print(f"Total PUTs: {put_num}")
             print(f"Total errors: {error_num}")
+
+    def run_server():
+        server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        server_socket.bind(('localhost', 51234))
+        server_socket.listen(5)
+        print("Server started on port 51234")
 
 
 
