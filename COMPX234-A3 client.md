@@ -27,6 +27,7 @@ def run_client(hostname, port, request_file):
                  #Receive up to 1024 bytes of response data from the server and decode it into a UTF-8 string.
                  data=client_socket.recv(1024)
                  response=data.decode('utf- 8')
+                 print(f"{line}: {response}")
     client_socket.close()
 
 if __name__ == "__main__":
