@@ -46,20 +46,33 @@ def Cope_with_client(client_socket):
         command=request[3]  #Extract the operation command from the 4th character of the request string.
         if command == 'R':  #Count according to the corresponding commands.
           read_num+= 1
-          return process_read()
+          return process_read(key)
         elif command == 'G':
           get_num+= 1
-          return process_get()
+          return process_get(key)
         elif command == 'P':
           put+num+=1
-          return def process_put()
+          value = request[5 + len(key) + 1:]
+          return def process_put(key,value)
         return "Invalid command"
 
+    #Read the value of a specific key in the `tuple_info` dictionary. 
     def process_read():
+        if key in tuple_info:
+            return f"OK({key},{tuple_info[key]}) read"
 
+    #Retrieve and remove the value of a specific key from the `tuple_info` dictionary.
     def process_get():
+        if key in tuple_info:
+           value = tuple_info.pop(key)
+           return f"OK ({key}, {value}) removed"
 
+    #Insert a new key-value pair into the `tuple_info` dictionary.
     def process_put():
+        if key in tuple_info:
+            return f"ERR {key} already exists"
+        tuple_info[key]=value
+        return f"OK ({key}, {value}) added"
 
     def print_all():
 
