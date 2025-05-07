@@ -1,5 +1,8 @@
 # Welcome to GitHub Desktop!
 
+This is your README. READMEs are where you can communicate what your project is and how to use it.
+
+
 YaoHaowen
 Write your name on line 6, save it, and then head back to GitHub Desktop.
 
@@ -77,13 +80,13 @@ def Cope_with_client(client_socket):
         while True:
             sleep(10)#
             tuple_num=len(tuple_info)
-            total_tuple_size =sum(len(key) + len(value) for key, value in tuple_info.items())#Calculate the total size of key-value pairs.
-            total_key_size =sum(len(key) for key in tuple_info.keys())#Calculate the total size of the keys.
-            total_value_size =sum(len(value) for value in tuple_info.values())#Calculate the total size of the values.
+            total_tuple_size =sum(len(key) + len(value) for key, value in tuple_info.items())
+            total_key_size =sum(len(key) for key in tuple_info.keys())
+            total_value_size =sum(len(value) for value in tuple_info.values())
 
-            average_tuple_size =total_tuple_size / tuple_num if tuple_num > 0 else 0  #Calculate the average size of key-value pairs.
-            average_key_size = total_key_size / tuple_num if tuple_num > 0 else 0  #Calculate the average size of keys.
-            average_value_size = total_value_size / tuple_num if tuple_num > 0 else 0  #Calculate the average size.
+            average_tuple_size =total_tuple_size / tuple_num if tuple_num > 0 else 0
+            average_key_size = total_key_size / tuple_num if tuple_num > 0 else 0
+            average_value_size = total_value_size / tuple_num if tuple_num > 0 else 0
 
             print("Tuple Space Summary:")
             print(f"Number of tuples: {tuple_num}")
