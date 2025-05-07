@@ -6,9 +6,16 @@ def optimize_input(line):
     parts = line.split(' ')  #Split the input `line` into multiple parts by spaces.
     command = parts[0]
     key = parts[1]
-    value = parts[2]
-    size = 7 + len(key) + len(value)
-    return f"{size:03d} {command} {key} {value}"
+    if command == 'PUT':
+        value = parts[2]
+        size = 7 + len(key) + len(value)
+        return f"{size:03d} {command} {key} {value}"
+    else:
+        size = 7 + len(key)
+        return f"{size:03d} {command} {key}"
 
-def run_client():
+def run_client(hostname, port, request_file):
+      #Create a TCP socket object. `socket.AF_INET` indicates using the IPv4 address family. Try to connect to the specified server.
+     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+     client_socket.connect((hostname, port))
     
