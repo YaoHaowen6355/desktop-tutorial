@@ -94,7 +94,7 @@ class UDPServer:
             self.server_socket.close()
             print("server close")
 
-    if __name__ == "__main__":
+if __name__ == "__main__":
         if len(sys.argv) != 2:
             print("method: python A4server.py 51234")
             sys.exit(1)

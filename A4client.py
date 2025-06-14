@@ -3,6 +3,7 @@ import sys
 import threading
 import time
 import base64
+import os
 
 class UDPClient:
     def __init__(self, server_host, server_port, file_list_path):
@@ -29,7 +30,7 @@ class UDPClient:
                 self.current_timeout *= 2
                 self.client_socket.settimeout(self.current_timeout / 1000)
                 print(f"Retry {retries}/{self.max_retries}, waiting {wait_time} seconds")
-                sleep(wait_time) #set sleep time for retry
+                time.sleep(wait_time) #set sleep time for retry
                 if retries > self.max_retries:
                     print("Max retries reached")
                     return None #input nothing due to retry times error
@@ -76,18 +77,14 @@ class UDPClient:
             with open(save_path, 'wb') as f:
                 downloaded = 0
                 block_size = 8192  # 8KB block size
-                data_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-                data_socket.settimeout(self.current_timeout / 1000)
+
 
                 print(f"[process] 0.00% (0/{file_size} byte)", end="", flush=True)
                 while downloaded < file_size:
                     end = min(downloaded + block_size - 1, file_size - 1)
                     request_msg = f"FILE {filename} GET START {downloaded} END {end}"
                     response = self.send_and_receive(request_msg, (self.server_host, data_port))
-                    if not response:
-                        print(f"Data reception timeout")
-                        data_socket.close()
-                        return False
+
 
                     if response.startswith("FILE") and "OK" in response:
                         try:
@@ -162,3 +159,14 @@ class UDPClient:
             finally:
                 self.client_socket.close()
                 print("client is closed")
+if __name__ == "__main__":
+    if len(sys.argv) != 4:
+        print("method: python A4client.py localhost 51234 files.txt") #the order in my computer
+        sys.exit(1)
+
+    server_host = sys.argv[1]
+    server_port = sys.argv[2]
+    file_list_path = sys.argv[3]
+
+    client = UDPClient(server_host, server_port, file_list_path)
+    client.run()
