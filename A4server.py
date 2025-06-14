@@ -35,7 +35,31 @@ class UDPServer:
                         parts = request_str.split()
                         if not parts:
                             continue
+                        if parts[0] == "FILE" and parts[-1] == "CLOSE":
+                            close_ok_msg = f"FILE {filename} CLOSE_OK"
+                            data_socket.sendto(close_ok_msg.encode(), client_address)
+                            running = False
 
+                        elif parts[0] == "FILE" and parts[1] == filename and parts[2] == "GET":
+                            try:
+                                start_idx = parts.index("START") + 1
+                                end_idx = parts.index("END") + 1
+                                start = int(parts[start_idx])
+                                end = int(parts[end_idx])
+
+                                if start < 0 or end >= file_size or start > end:
+                                    continue
+
+                                f.seek(start)
+                                data = f.read(end - start + 1)
+
+                                if not data:
+                                    error_msg = f"ERR {filename} EMPTY_DATA START {start} END {end}"
+                                    data_socket.sendto(error_msg.encode(), client_address)
+                                    continue
+
+                            except (ValueError, IndexError):
+                                continue
 
                     except socket.timeout:
                         continue
