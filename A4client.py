@@ -33,6 +33,24 @@ class UDPClient:
                 if retries > self.max_retries:
                     print("Max retries reached")
                     return None #input nothing due to retry times error
+
+                file_size = 0
+                if response.startswith("OK"):
+                    parts = response.split()
+                    try:
+                        file_size = int(parts[parts.index("SIZE") + 1]) #Get file size
+                        data_port = int(parts[parts.index("PORT") + 1]) #Extract data port
+                        print(f"file size: {file_size} byte，Data port: {data_port}")
+                    except (ValueError, IndexError):
+                        print(f"Server response format error")
+                        return False
+                elif response.startswith("ERR"):
+                    print(f"Server response: {response}")
+                    return False
+                else:
+                    print(f"unknown response: {response}")
+                    return False
+
             except Exception as e:
                 print(f"Other error: {str(e)}")
                 return None
