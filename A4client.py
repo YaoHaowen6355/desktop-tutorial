@@ -13,3 +13,19 @@ class UDPClient:
         self.retry_sleep = 1  # Initial retry interval (in seconds)
         self.current_timeout = 2000
 
+    def send_and_receive(self, message, address):
+        retries = 0
+        while retries <= self.max_retries:#Send requests and receive responses with support for retransmission mechanism
+            try:
+                self.client_socket.sendto(message.encode(), address)
+                response, _ = self.client_socket.recvfrom(65535)
+                return response.decode().strip()
+
+            except socket.timeout:
+                retries += 1
+                wait_time = self.retry_sleep * (2 ** (retries - 1))
+                self.current_timeout *= 2
+                self.client_socket.settimeout(self.current_timeout / 1000)
+                print(f"Retry {retries}/{self.max_retries}, waiting {wait_time} seconds")
+                sleep(wait_time) #set sleep time for retry
+                
