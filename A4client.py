@@ -28,4 +28,9 @@ class UDPClient:
                 self.client_socket.settimeout(self.current_timeout / 1000)
                 print(f"Retry {retries}/{self.max_retries}, waiting {wait_time} seconds")
                 sleep(wait_time) #set sleep time for retry
-                
+                if retries > self.max_retries:
+                    print("Max retries reached")
+                    return None #input nothing due to retry times error
+            except Exception as e:
+                print(f"Other error: {str(e)}")
+                return None
