@@ -14,8 +14,8 @@ class UDPServer:
     def handle_client(self, filename, client_address):
         try:  #Check if the requested file exists
             if not os.path.exists(filename):
-                error = f"{filename} Not_Found"
-                self.server_socket.sendto(error.encode(), client_address)
+                error_msg = f"{filename} Not_Found"
+                self.server_socket.sendto(error_msg.encode(), client_address)
                 return
 
             file_size = os.path.getsize(filename)  #Get file size
@@ -23,5 +23,24 @@ class UDPServer:
             data_socket.settimeout(5)
             data_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             data_socket.bind(('0.0.0.0', data_port))
-            ok = f"OK {filename} SIZE {file_size} PORT {data_port}"
-            self.server_socket.sendto(ok.encode(), client_address)
+            ok_msg = f"OK {filename} SIZE {file_size} PORT {data_port}"
+            self.server_socket.sendto(ok_msg.encode(), client_address)
+
+            with open(filename, 'rb') as f:  #Open the file in binary mode
+                running = True
+                while running:
+                    try:
+                        request, _ = data_socket.recvfrom(65535)
+                        request_str = request.decode().strip()
+                        parts = request_str.split()
+                        if not parts:
+                            continue
+
+
+                    except socket.timeout:
+                        continue
+                    except Exception:
+                        continue
+
+        except Exception:
+            pass
