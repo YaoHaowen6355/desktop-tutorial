@@ -52,12 +52,13 @@ class UDPServer:
 
                                 f.seek(start)
                                 data = f.read(end - start + 1)
-
                                 if not data:
                                     error_msg = f"ERR {filename} EMPTY_DATA START {start} END {end}"
                                     data_socket.sendto(error_msg.encode(), client_address)
                                     continue
-
+                                base64_data = base64.b64encode(data).decode()#Encode binary file data as a Base64 byte string
+                                response_msg = f"FILE {filename} OK START {start} END {end} DATA {base64_data}"
+                                data_socket.sendto(response_msg.encode(), client_address)
                             except (ValueError, IndexError):
                                 continue
 
@@ -65,6 +66,6 @@ class UDPServer:
                         continue
                     except Exception:
                         continue
-
+            data_socket.close()
         except Exception:
             pass
