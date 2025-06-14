@@ -33,7 +33,6 @@ class UDPClient:
                 if retries > self.max_retries:
                     print("Max retries reached")
                     return None #input nothing due to retry times error
-
             except Exception as e:
                 print(f"Other error: {str(e)}")
                 return None
@@ -84,8 +83,52 @@ class UDPClient:
                 while downloaded < file_size:
                     end = min(downloaded + block_size - 1, file_size - 1)
                     request_msg = f"FILE {filename} GET START {downloaded} END {end}"
-
                     response = self.send_and_receive(request_msg, (self.server_host, data_port))
+                    if not response:
+                        print(f"Data reception timeout")
+                        data_socket.close()
+                        return False
+
+                    if response.startswith("FILE") and "OK" in response:
+                        try:
+                            parts = response.split()
+                            start_idx = parts.index("START") + 1
+                            end_idx = parts.index("END") + 1
+                            resp_start = int(parts[start_idx])
+                            resp_end = int(parts[end_idx])
+
+                            if resp_start != downloaded or resp_end < resp_start:
+                                print(f"Response range mismatch")
+                                continue
+                            # Extract Base64-encoded data from response
+                            data_idx = parts.index("DATA") + 1
+                            base64_data = " ".join(parts[data_idx:])
+                            try:
+                                file_data = base64.b64decode(base64_data)
+                                if len(file_data) == 0:
+                                    print("Received empty data block")
+                                    continue
+                            except base64.binascii.Error:
+                                print(f"Base64 decoding failed")
+                                continue
+                            f.write(file_data)   # Write data to file and update progress
+                            f.flush()   # Ensure data is written immediately
+                            previous_downloaded = downloaded
+                            downloaded = resp_end + 1
+
+                            if (downloaded // (file_size // 10)) > (
+                                    previous_downloaded // (file_size // 10)):  # Display progress (update every 10%)
+                                progress = (downloaded / file_size) * 100
+                                print(f"\r[progress] {progress:.2f}% ({downloaded}/{file_size} byte)", end="", flush=True)
+
+                        except (ValueError, IndexError):
+                            print(f"\nResponse format error")
+                            data_socket.close()
+                            return False
+                    else:
+                        print(f"\nUnknown response format")
+                        data_socket.close()
+                        return False
 
         except Exception as e:
             print(f"Download error: {str(e)}")
