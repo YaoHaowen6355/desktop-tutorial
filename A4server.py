@@ -35,8 +35,8 @@ class UDPServer:
                         request_str = request.decode().strip()
                         parts = request_str.split()
                         if not parts:
-                            continue
-                        if parts[0] == "FILE" and parts[-1] == "CLOSE":
+                            continue  # Skip empty requests
+                        if parts[0] == "FILE" and parts[-1] == "CLOSE":  #Handle file close command from client
                             close_ok_msg = f"FILE {filename} CLOSE_OK"
                             data_socket.sendto(close_ok_msg.encode(), client_address)
                             running = False
@@ -48,10 +48,11 @@ class UDPServer:
                                 start = int(parts[start_idx])
                                 end = int(parts[end_idx])
 
+                                # Validate requested byte range
                                 if start < 0 or end >= file_size or start > end:
                                     continue
 
-                                f.seek(start)
+                                f.seek(start) #Read specified bytes from file
                                 data = f.read(end - start + 1)
                                 if not data:
                                     error_msg = f"ERR {filename} EMPTY_DATA START {start} END {end}"
@@ -67,7 +68,7 @@ class UDPServer:
                         continue
                     except Exception:
                         continue
-            data_socket.close()
+            data_socket.close() #ensure the socket is closed
         except Exception:
             pass
 
