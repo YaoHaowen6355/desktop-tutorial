@@ -1,6 +1,8 @@
 import socket
 import sys
 import threading
+import time
+import base64
 
 class UDPClient:
     def __init__(self, server_host, server_port, file_list_path):
@@ -34,3 +36,20 @@ class UDPClient:
             except Exception as e:
                 print(f"Other error: {str(e)}")
                 return None
+
+    def download_file(self, filename, data_port):
+        try:
+            # Determine the save path
+            desktop = os.path.join(os.path.expanduser("~"), "Desktop")
+            save_path = os.path.join(desktop, filename)
+            #Verify directory writability
+            if not os.path.exists(desktop):
+                os.makedirs(desktop)
+            if not os.access(desktop, os.W_OK):
+                print(f"Cannot write to desktop directory")
+                return False
+
+            print(f"Starting download: {filename}")
+        except Exception as e:
+            print(f"Download error: {str(e)}")
+            return False
