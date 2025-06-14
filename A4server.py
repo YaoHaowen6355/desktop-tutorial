@@ -21,9 +21,10 @@ class UDPServer:
 
             file_size = os.path.getsize(filename)  #Get file size
             data_port = randint(50000, 51000)  #Randomly select a port between 50000 and 51000
-            data_socket.settimeout(5)
             data_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             data_socket.bind(('0.0.0.0', data_port))
+            data_socket.settimeout(5)
+
             ok_msg = f"OK {filename} SIZE {file_size} PORT {data_port}"
             self.server_socket.sendto(ok_msg.encode(), client_address)
 

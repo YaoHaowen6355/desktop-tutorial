@@ -77,14 +77,18 @@ class UDPClient:
             with open(save_path, 'wb') as f:
                 downloaded = 0
                 block_size = 8192  # 8KB block size
-
+                data_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                data_socket.settimeout(self.current_timeout / 1000)
 
                 print(f"[process] 0.00% (0/{file_size} byte)", end="", flush=True)
                 while downloaded < file_size:
                     end = min(downloaded + block_size - 1, file_size - 1)
                     request_msg = f"FILE {filename} GET START {downloaded} END {end}"
                     response = self.send_and_receive(request_msg, (self.server_host, data_port))
-
+                    if not response:
+                        print(f"Data reception timeout")
+                        data_socket.close()
+                        return False
 
                     if response.startswith("FILE") and "OK" in response:
                         try:
