@@ -129,8 +129,16 @@ class UDPClient:
                         print(f"\nUnknown response format")
                         data_socket.close()
                         return False
-
+                print(f"\r[progress] 100.00% ({file_size}/{file_size} byte) - download successfully")
+                # Send close request
+                close_msg = f"FILE {filename} CLOSE"
+                close_response = self.send_and_receive(close_msg, (self.server_host, data_port))
+                if close_response and close_response.startswith("FILE") and "CLOSE_OK" in close_response:
+                    print("Connection closed")
+                else:
+                    print("No closure confirmation received")
+                data_socket.close()
+                return True
         except Exception as e:
             print(f"Download error: {str(e)}")
             return False
-
