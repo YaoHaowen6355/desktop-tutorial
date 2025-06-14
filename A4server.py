@@ -3,6 +3,7 @@ import sys
 import threading
 import os
 from random import randint
+import base64
 
 class UDPServer:
     def __init__(self, port):
@@ -69,3 +70,22 @@ class UDPServer:
             data_socket.close()
         except Exception:
             pass
+
+    def run(self):
+        try:
+            while True:
+                request, client_address = self.server_socket.recvfrom(65535)#Receive a maximum of 65535 bytes of data each time
+                request_str = request.decode().strip()
+                if request_str.startswith("DOWNLOAD"):
+                    parts = request_str.split()
+                    if len(parts) >= 2:
+                        filename = parts[1]
+                        client_thread = threading.Thread(
+                            target=self.handle_client,
+                            args=(filename, client_address)
+                        )
+                        client_thread.daemon = True
+                        client_thread.start()
+
+        except KeyboardInterrupt:
+            print("The server is stopped by the user.")
