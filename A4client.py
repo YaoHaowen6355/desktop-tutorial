@@ -34,36 +34,6 @@ class UDPClient:
                     print("Max retries reached")
                     return None #input nothing due to retry times error
 
-                file_size = 0
-                if response.startswith("OK"):
-                    parts = response.split()
-                    try:
-                        file_size = int(parts[parts.index("SIZE") + 1]) #Get file size
-                        data_port = int(parts[parts.index("PORT") + 1]) #Extract data port
-                        print(f"file size: {file_size} byte，Data port: {data_port}")
-                    except (ValueError, IndexError):
-                        print(f"Server response format error")
-                        return False
-                elif response.startswith("ERR"):
-                    print(f"Server response: {response}")
-                    return False
-                else:
-                    print(f"unknown response: {response}")
-                    return False
-
-                with open(save_path, 'wb') as f:
-                    downloaded = 0
-                    block_size = 8192  # 8KB block size
-                    data_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-                    data_socket.settimeout(self.current_timeout / 1000)
-
-                    print(f"[process] 0.00% (0/{file_size} byte)", end="", flush=True)
-                    while downloaded < file_size:
-                        end = min(downloaded + block_size - 1, file_size - 1)
-                        request_msg = f"FILE {filename} GET START {downloaded} END {end}"
-
-                        response = self.send_and_receive(request_msg, (self.server_host, data_port))
-
             except Exception as e:
                 print(f"Other error: {str(e)}")
                 return None
@@ -87,6 +57,35 @@ class UDPClient:
             if not response:
                 print(f"No server response received")
                 return False
+            file_size = 0
+            if response.startswith("OK"):
+                parts = response.split()
+                try:
+                    file_size = int(parts[parts.index("SIZE") + 1])  # Get file size
+                    data_port = int(parts[parts.index("PORT") + 1])  # Extract data port
+                    print(f"file size: {file_size} byte，Data port: {data_port}")
+                except (ValueError, IndexError):
+                    print(f"Server response format error")
+                    return False
+            elif response.startswith("ERR"):
+                print(f"Server response: {response}")
+                return False
+            else:
+                print(f"unknown response: {response}")
+                return False
+
+            with open(save_path, 'wb') as f:
+                downloaded = 0
+                block_size = 8192  # 8KB block size
+                data_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                data_socket.settimeout(self.current_timeout / 1000)
+
+                print(f"[process] 0.00% (0/{file_size} byte)", end="", flush=True)
+                while downloaded < file_size:
+                    end = min(downloaded + block_size - 1, file_size - 1)
+                    request_msg = f"FILE {filename} GET START {downloaded} END {end}"
+
+                    response = self.send_and_receive(request_msg, (self.server_host, data_port))
 
         except Exception as e:
             print(f"Download error: {str(e)}")
