@@ -142,3 +142,13 @@ class UDPClient:
         except Exception as e:
             print(f"Download error: {str(e)}")
             return False
+
+    def run(self):
+            try:
+                with open(self.file_list_path, 'r') as f: # Read file list
+                    file_list = [line.strip() for line in f if line.strip() and not line.strip().startswith('#')]
+                if not file_list:
+                    print("file list is empty")
+                    return
+            except FileNotFoundError:
+                print(f"file list is not exist: {self.file_list_path}")
