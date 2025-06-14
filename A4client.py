@@ -51,6 +51,19 @@ class UDPClient:
                     print(f"unknown response: {response}")
                     return False
 
+                with open(save_path, 'wb') as f:
+                    downloaded = 0
+                    block_size = 8192  # 8KB block size
+                    data_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                    data_socket.settimeout(self.current_timeout / 1000)
+
+                    print(f"[process] 0.00% (0/{file_size} byte)", end="", flush=True)
+                    while downloaded < file_size:
+                        end = min(downloaded + block_size - 1, file_size - 1)
+                        request_msg = f"FILE {filename} GET START {downloaded} END {end}"
+
+                        response = self.send_and_receive(request_msg, (self.server_host, data_port))
+
             except Exception as e:
                 print(f"Other error: {str(e)}")
                 return None
@@ -68,6 +81,14 @@ class UDPClient:
                 return False
 
             print(f"Starting download: {filename}")
+            download_msg = f"DOWNLOAD {filename}"  # Send download request
+            response = self.send_and_receive(download_msg, (self.server_host, self.server_port))
+
+            if not response:
+                print(f"No server response received")
+                return False
+
         except Exception as e:
             print(f"Download error: {str(e)}")
             return False
+
