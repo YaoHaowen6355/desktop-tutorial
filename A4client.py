@@ -150,5 +150,15 @@ class UDPClient:
                 if not file_list:
                     print("file list is empty")
                     return
+                print(f"begin to download {len(file_list)} files")
+                for i, filename in enumerate(file_list): #output detail information for files
+                    print(f"\n===== file {i + 1}/{len(file_list)}: {filename} =====")
+                    if self.download_file(filename, 0):
+                        print(f"file {filename} download successfully")
+                    else:
+                        print(f"file {filename} download failed")
             except FileNotFoundError:
                 print(f"file list is not exist: {self.file_list_path}")
+            finally:
+                self.client_socket.close()
+                print("client is closed")
