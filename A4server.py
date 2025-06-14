@@ -89,3 +89,6 @@ class UDPServer:
 
         except KeyboardInterrupt:
             print("The server is stopped by the user.")
+        finally:
+            self.server_socket.close()
+            print("server close")
